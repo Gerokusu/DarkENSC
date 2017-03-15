@@ -1,16 +1,16 @@
-set_stream(encoding, utf8).
+:- encoding(utf8).
 
 %Initialisation des prédicats dynamiques
 :- dynamic position/1, porte/3, objet/2.
 
-%À rerentrer dans demarrer
+%Ã rerentrer dans demarrer
 :- retractall(position(_)).
 :- retractall(objet(_)).
 
 %Position actuelle du joueur
 position(foyer).
 
-%Définition des données
+%DÃ©finition des donnÃ©es
 porte(foyer, n, hall_sud).
 porte(hall_sud, s, foyer).
 porte(hall_sud, e, s101103).
@@ -30,13 +30,13 @@ porte(administration,s,hall_ouest).
 objet(carte_etudiante, biblio).
 objet(pistolet, hall_sud).
 
-%Définition des données de jeu
+%DÃ©finition des donnÃ©es de jeu
 demarrer :-
     nl,
-    write('Vous vous r�veillez d\'un sommeil profond, accompagn� d\'un mal au cr�ne notoire, et d\'une sensation de malaise. Vous vous sentez seul.'),
+    write('Vous vous réveillez d\'un sommeil profond, accompagné d\'un mal au crâne notoire, et d\'une sensation de malaise. Vous vous sentez seul.'),
     nl,
     nl,
-    write('Les commandes suivantes sont � votre disposition (terminer par un point) :'),
+    write('Les commandes suivantes sont à votre disposition (terminer par un point) :'),
     nl,
     write('    n                            aller au nord'),
     nl,
@@ -53,22 +53,23 @@ demarrer :-
     position(Salle),
     salle(Salle).
 
-%La salle décrit l'événement déclenché à l'entrée de la salle
+%La salle dÃ©crit l'Ã©vÃ©nement dÃ©clenchÃ© Ã  l'entrÃ©e de la salle
 
 salle(foyer) :-
     nl,
-    write('[FOYER DE L\'�COLE] - Le foyer de l\'�cole est d\'habitude un endroit serein o� les �l�ves ont l\'habitude de se reposer. Mais il est anormalement sale, poussi�reux, et pr�sente quelques traces de sang. Le baby-foot est cass�, le bar est vide, les canap�s sont d�chir�s et une seule porte, au nord, est en �tat de fonctionner. Elle m�ne au hall sud.'),
-    nl.
+    write('[FOYER DE L\'ÉCOLE] - Le foyer de l\'école est d\'habitude un endroit serein où les élèves ont l\'habitude de se reposer. Mais il est anormalement sale, poussiéreux, et présente quelques traces de sang. Le baby-foot est cassé, le bar est vide, les canapés sont déchirés et une seule porte, au nord, est en état de fonctionner. Elle mène au hall sud.'),
+    nl,
+    !.
 
 salle(hall_sud) :-
     nl,
-    write('[HALL SUD] - Du hall sud, on peut observer au nord le patio � travers les baies vitr�es opaques. Un vent sombre et silencieux y r�gne, et la porte automatique ne semble pas vouloir bouger d\'un millim�tre. � l\'est, la S101-S103 est bloqu�e par une poutre et un texte rouge vif, �crit dans la pr�cipitation, stipulant de "NE PAS OUVRIR". � l\'ouest, le couloir menant au b�timent ouest s\'�tend pendant plusieurs longues dizaines de m�tres. Au sud, se trouve le foyer.'),
+    write('[HALL SUD] - Du hall sud, on peut observer au nord le patio à travers les baies vitrées opaques. Un vent sombre et silencieux y rêgne, et la porte automatique ne semble pas vouloir bouger d\'un millimètre. À l\'est, la S101-S103 est bloquée par une poutre et un texte rouge vif, écrit dans la précipitation, stipulant de "NE PAS OUVRIR". À l\'ouest, le couloir menant au bâtiment ouest s\'étend pendant plusieurs longues dizaines de mètres. Au sud, se trouve le foyer.'),
     nl.
 
 salle(s101103) :-
     nl,
     %RAJOUTER SARACCO
-    write('[S101-103] - Apr�s avoir ignor� l\'avertissement et lutt� pour lever la poutre qui bloquait l\'entr�e de la salle S101-S103, une vision d\'horreur remplace la sc�ne : un tableau rempli de formules statistiques, quelques amas de chairs pendant au plafond et des tables cass�es. Aussit�t, une ombre se profile au loin, puis disparait. Elle ressurgit dans un vacarme assourdissant � la seconde d\'apr�s, arm�e d\'un regard fixe et d\'un sourire de cauchemar. Il est d�j�trop tard.'),
+    write('[S101-103] - Après avoir ignoré l\'avertissement et lutté pour lever la poutre qui bloquait l\'entrée de la salle S101-S103, une vision d\'horreur remplace la scène : un tableau rempli de formules statistiques, quelques amas de chairs pendant au plafond et des tables cassées. Aussitôt, une ombre se profile au loin, puis disparait. Elle ressurgit dans un vacarme assourdissant à la seconde d\'après, armée d\'un regard fixe et d\'un sourire de cauchemar. Il est déjà trop tard.'),
     nl,
     mourir_prevention.
 
@@ -130,15 +131,15 @@ deplacer(Position, Destination) :-
 ramasser(Objet) :-
     position(Position),
     objet(Objet,Position),
-    assert(objet(Objet, inventaire)), %inventaire est considéré comme une "salle" imaginaire
+    assert(objet(Objet, inventaire)), %inventaire est considÃ©rÃ© comme une "salle" imaginaire
     retract(objet(Objet, Position)),
     nl,
-    write('Youpi ! L\'objet '), write(Objet),write(' a �t� ajout� au sac !'),
+    write('Youpi ! L\'objet '), write(Objet),write(' a été ajouté au sac !'),
     nl.
 
 ramasser(_):-
     nl,
-    write('rien � ramasser d�bile'),
+    write('rien à ramasser débile'),
     nl.
 
 % Affiche l'inventaire
@@ -153,13 +154,13 @@ inventaire :-
 
 mourir :-
     nl,
-    write('VOUS �TES MORT.'),
+    write('VOUS ÊTES MORT.'),
     nl,
     deplacer(_, mort).
 
 mourir_prevention :-
     nl,
-    write('VOUS �TES MORT (ET VOUS ʉTIEZ PRɉVENUS).'),
+    write('VOUS ÊTES MORT (ET VOUS ÊTIEZ PRÉVENUS).'),
     nl,
     deplacer(_, mort).
 
