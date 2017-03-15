@@ -1,2 +1,2 @@
 @ECHO OFF
-swipl -s src/darkensc.pro
+swipl -l src/darkensc.pro

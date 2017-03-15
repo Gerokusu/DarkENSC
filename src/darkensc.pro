@@ -1,13 +1,16 @@
-%Initialisation des pr√©dicats dynamiques
-:- dynamic position/1, objet/2, porte/3.
+set_stream(encoding, utf8).
 
-    %√† rerentrer dans demarrer
+%Initialisation des pr√©dicats dynamiques
+:- dynamic position/1, porte/3, objet/2.
+
+%√Ä rerentrer dans demarrer
 :- retractall(position(_)).
-:- retractall(objet(_)). 
+:- retractall(objet(_)).
 
 %Position actuelle du joueur
 position(foyer).
 
+%D√©finition des donn√©es
 porte(foyer, n, hall_sud).
 porte(hall_sud, s, foyer).
 porte(hall_sud, e, s101103).
@@ -24,28 +27,28 @@ porte(hall_ouest,s,couloir_amphi).
 porte(hall_ouest,n,administration).
 porte(administration,s,hall_ouest).
 
-objet(carte_etudiante, biblio).  
+objet(carte_etudiante, biblio).
 objet(pistolet, hall_sud).
 
-%D√©finition des donn√©es de jeu  
-demarrer :-  
+%D√©finition des donn√©es de jeu
+demarrer :-
     nl,
-    write('Vous vous r√©veillez d\'un sommeil profond, accompagn√© d\'un mal au cr√¢ne notoire, et d\'une sensation de malaise. Vous vous sentez seul.'),
+    write('Vous vous rÈveillez d\'un sommeil profond, accompagnÈ d\'un mal au cr‚ne notoire, et d\'une sensation de malaise. Vous vous sentez seul.'),
     nl,
     nl,
-    write('Les commandes suivantes sont √† votre disposition (terminer par un point) :'),
+    write('Les commandes suivantes sont ‡ votre disposition (terminer par un point) :'),
     nl,
-    write('    n    :               aller au nord'),
+    write('    n                            aller au nord'),
     nl,
-    write('    e    :               aller l\'est'),
+    write('    e                            aller l\'est'),
     nl,
-    write('    s    :               aller au sud'),
+    write('    s                            aller au sud'),
     nl,
-    write('    o    :               aller l\'ouest'),
+    write('    o                            aller l\'ouest'),
     nl,
-    write('    ramasser(objet)    :               ramasser un objet'),
+    write('    ramasser(objet)              ramasser un objet'),
     nl,
-    write('    inventaire    :              afficher le contenu de votre inventaire'),
+    write('    inventaire                   afficher le contenu de votre inventaire'),
     nl,
     position(Salle),
     salle(Salle).
@@ -54,18 +57,18 @@ demarrer :-
 
 salle(foyer) :-
     nl,
-    write('[FOYER DE L\'√âCOLE] - Le foyer de l\'√©cole est d\'habitude un endroit serein o√π les √©l√®ves ont l\'habitude de se reposer. Mais il est anormalement sale, poussi√©reux, et pr√©sente quelques traces de sang. Le baby-foot est cass√©, le bar est vide, les canap√©s sont l√©g√®rement d√©chir√©s et une seule porte, en haut, est en √©tat de fonctionner. Elle m√®ne au hall sud.'),
+    write('[FOYER DE L\'…COLE] - Le foyer de l\'Ècole est d\'habitude un endroit serein o˘ les ÈlËves ont l\'habitude de se reposer. Mais il est anormalement sale, poussiÈreux, et prÈsente quelques traces de sang. Le baby-foot est cassÈ, le bar est vide, les canapÈs sont dÈchirÈs et une seule porte, au nord, est en Ètat de fonctionner. Elle mËne au hall sud.'),
     nl.
 
 salle(hall_sud) :-
     nl,
-    write('[HALL SUD] - Du hall sud, on peut observer le patio √† travers les baies vitr√©es opaques. Un vent sombre et silencieux y r√®gne, et la porte automatique ne semble pas vouloir bouger d\'un centim√®tre. √Ä droite, la S101-S103 est bloqu√©e par une poutre et un texte rouge vif, √©crit dans la pr√©cipitation, stipulant de "NE PAS OUVRIR". √Ä gauche, le couloir menant au b√¢timent ouest s\'√©tend pendant plusieurs longues dizaines de m√®tres. En bas, se trouve le foyer.'),
+    write('[HALL SUD] - Du hall sud, on peut observer au nord le patio ‡ travers les baies vitrÈes opaques. Un vent sombre et silencieux y rÍgne, et la porte automatique ne semble pas vouloir bouger d\'un millimËtre. ¿ l\'est, la S101-S103 est bloquÈe par une poutre et un texte rouge vif, Ècrit dans la prÈcipitation, stipulant de "NE PAS OUVRIR". ¿ l\'ouest, le couloir menant au b‚timent ouest s\'Ètend pendant plusieurs longues dizaines de mËtres. Au sud, se trouve le foyer.'),
     nl.
 
 salle(s101103) :-
     nl,
     %RAJOUTER SARACCO
-    write('[S101-103] - Apr√®s avoir ignor√© l\'avertissement et lutt√© pour lever la poutre qui bloquait l\'entr√©e de la salle S101-S103, une vision d\'horreur remplace la sc√®ne : un tableau rempli de formules statistiques, quelques amas de chairs pendant au plafond et des tables cass√©es. Aussit√¥t, une ombre se profile au loin, puis disparait. Elle ressurgit dans un vacarme assourdissant √† la seconde d\'apr√®s, arm√©e d\'un regard fixe et d\'un sourire de cauchemar. Il est d√©j√† trop tard.'),
+    write('[S101-103] - AprËs avoir ignorÈ l\'avertissement et luttÈ pour lever la poutre qui bloquait l\'entrÈe de la salle S101-S103, une vision d\'horreur remplace la scËne : un tableau rempli de formules statistiques, quelques amas de chairs pendant au plafond et des tables cassÈes. AussitÙt, une ombre se profile au loin, puis disparait. Elle ressurgit dans un vacarme assourdissant ‡ la seconde d\'aprËs, armÈe d\'un regard fixe et d\'un sourire de cauchemar. Il est dÈj‡†trop tard.'),
     nl,
     mourir_prevention.
 
@@ -130,17 +133,17 @@ ramasser(Objet) :-
     assert(objet(Objet, inventaire)), %inventaire est consid√©r√© comme une "salle" imaginaire
     retract(objet(Objet, Position)),
     nl,
-    write('Youpi ! L\'objet '), write(Objet),write(' a √©t√© ajout√© au sac !'),
+    write('Youpi ! L\'objet '), write(Objet),write(' a ÈtÈ ajoutÈ au sac !'),
     nl.
-   
+
 ramasser(_):-
     nl,
-    write('rien √† ramasser d√©bile'),
+    write('rien ‡ ramasser dÈbile'),
     nl.
 
 % Affiche l'inventaire
-inventaire :- 
-    write('INVENTAIRE :'), 
+inventaire :-
+    write('INVENTAIRE :'),
     nl,
     forall(objet(X,inventaire), (write('- '),write(X),nl)).
 
@@ -150,13 +153,13 @@ inventaire :-
 
 mourir :-
     nl,
-    write('VOUS √äTES MORT.'),
+    write('VOUS  TES MORT.'),
     nl,
     deplacer(_, mort).
 
 mourir_prevention :-
     nl,
-    write('VOUS √äTES MORT (ET VOUS √âTIEZ PR√âVENUS).'),
+    write('VOUS  TES MORT (ET VOUS  âTIEZ PR…âVENUS).'),
     nl,
     deplacer(_, mort).
 
@@ -165,4 +168,3 @@ n :- aller(n).
 e :- aller(e).
 s :- aller(s).
 o :- aller(o).
-
