@@ -2,6 +2,7 @@
 :- dynamic position/1.
 :- retractall(position(_)).
 
+%Position actuelle du joueur
 position(foyer).
 
 %Définition des données de jeu
@@ -27,6 +28,8 @@ demarrer :-
     nl,
     position(Salle),
     salle(Salle).
+
+%La salle décrit l'événement déclenché à l'entrée de la salle
 
 salle(foyer) :-
     nl,
