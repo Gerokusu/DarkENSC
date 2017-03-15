@@ -1,2 +1,2 @@
 #!/bin/bash
-prolog -s darkensc.pro
+prolog -s src/darkensc.pro
