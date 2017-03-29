@@ -63,7 +63,11 @@ salle(foyer) :-
     !.
 
 salle(hall_sud) :-
-    writep('pistolet a rajouter [HALL SUD]', 'Du hall sud, on peut observer au nord le patio à travers les baies vitrées opaques. Un vent sombre et silencieux y rêgne, et la porte automatique ne semble pas vouloir bouger d\'un millimètre. À l\'est, la S101-S103 est bloquée par une poutre et un texte rouge vif, écrit dans la précipitation, stipulant de "NE PAS OUVRIR". À l\'ouest, le couloir de la bibliothèque s\'étend pendant plusieurs longues dizaines de mètres. Au sud, se trouve le foyer.'),
+    writep('[HALL SUD]', 'Du hall sud, on peut observer au nord le patio à travers les baies vitrées opaques. Un vent sombre et silencieux y rêgne, et la porte automatique ne semble pas vouloir bouger d\'un millimètre. À l\'est, la S101-S103 est bloquée par une poutre et un texte rouge vif, écrit dans la précipitation, stipulant de "NE PAS OUVRIR". À l\'ouest, le couloir de la bibliothèque s\'étend pendant plusieurs longues dizaines de mètres. Au sud, se trouve le foyer.'),
+    (
+        objet('pistolet', 'inventaire');
+        writel('Au sol se trouve un pistolet un peu sale, mais il semble fonctionner.')
+    ),
     !.
 
 salle(s101103) :-
@@ -71,7 +75,7 @@ salle(s101103) :-
     mourir_prevention.
 
 salle(couloir_biblio) :-
-    writep('[COULOIR DE LA BIBLIOTHÈQUE]', ''),
+    writep('[COULOIR DE LA BIBLIOTHÈQUE]', 'Sombre et étroit, le couloir de la bibliothèque est un véritable piège qui pourrait se refermer à tout moment. Vers l\'est, le hall sud apparaît comme envahi par les ombres, et respire un danger proche. L\'autre bout du couloir, à l\'est, communique avec le couloir de l\'amphithéâtre. Au sud, la porte de la bibliothèque semble en bon état bien que récemment ouverte.'),
     !.
 
 salle(biblio) :-
@@ -79,25 +83,22 @@ salle(biblio) :-
     !.
 
 salle(couloir_amphi) :-
-    etat_actuel(_, N),
-    N < 3,
-    writep('[COULOIR DE L\'AMPHITHÉÂTRE]', 'lacces à lamphi est verrouille'),
+    verifier_etat(amphiOK),
+    writep('[COULOIR DE L\'AMPHITHÉÂTRE]', ''),
     !.
 
 salle(couloir_amphi) :-
-    etat_actuel(_, N),
-    N => 3,
-    writep('[COULOIR DE L\'AMPHITHÉÂTRE]', ''),
+    writep('[COULOIR DE L\'AMPHITHÉÂTRE]', 'lacces à lamphi est verrouille'),
     !.
 
 salle(amphi):-
     writep('[AMPHITHÉÂTRE]', 'Ecrire blablah il rentre dans l amphi et voit l ordi avec pesquet dessus (GIF) + trouver sol enigme sinon attention ombre de Paf + dire décrire la rep entre enigme()'),
     writel('ENIGME : Pour moi l\'accouchement est avant la grossesse, l\'enfance avant la naissance, l\'adolescence avant l\'enfant, la mort avant la vie. Qui suis-je?'),
-    !.   
+    !.
 
 salle(hall_ouest) :-
     writep('[HALL OUEST]', ''),
-    !.   
+    !.
 
 salle(administration) :-
     writep('[BUREAUX DE L\'ADMINISTRATION]', 'nadege bloque'),
@@ -108,14 +109,13 @@ salle(bureau_plotton):-
     !.
 
 salle(sortie):-
-    not(etat_actuel(courantRetabli)),
-    writel('vous ne pouvez pas sortir, courant marche pas'),
-    aller(r),
+    verifier_etat(courantRetabli),
+    writep('[SORTIE]', 'gagné !'),
     !.
 
 salle(sortie):-
-    etat_actuel(courantRetabli),
-    writep('[SORTIE]', 'gagné !'),
+    writel('vous ne pouvez pas sortir, courant marche pas'),
+    aller(r),
     !.
 
 salle(_):-
@@ -182,9 +182,13 @@ inventaire :-
 
 %Utiliser un objet de l'inventaire
 utiliser(pistolet):-
-    objet(pistolet,inventaire),
-    position(s101103);position(administration),
-    writel('ça sert à rien, trouve autre chose'),
+    objet(pistolet, inventaire),
+    (
+        position(s101103);
+        position(hall_sud);
+        position(administration)
+    ),
+    writel('Le pistolet n\'était pas chargé, et une inscription \'FACTICE\' figure sur la poignée. Dommage.'),
     !.
 
 utiliser(carte_etudiante):-
@@ -203,7 +207,7 @@ utiliser(dictionnaire):-
     !.
 
 utiliser(_):-
-    etat_actuel(courantRetabli, N),
+    verifier_etat(courantRetabli),
     writel('pas le temps, cours !'),
     !.
 
@@ -213,7 +217,7 @@ utiliser(_):-
 
 %Permet de vérifier si le joueur trouve l'énigme
 enigme(dictionnaire):-
-    position(amphi),    
+    position(amphi),
     not(objet(dictionnaire,inventaire)),
     assert(objet(dictionnaire, amphi)),
     writel('placard souvre et dico'),
@@ -226,7 +230,7 @@ enigme(_):-
     writel('paf la menace'),
     mourir_prevention,
     !.
-    
+
 enigme(_):-
     writel('Qu\'est ce que vous essayez de faire?').
 
@@ -238,6 +242,12 @@ changer_etat(Prochain) :-
     N2 > N1,
     retract(etat_actuel(E, N1)),
     assert(etat_actuel(Prochain, N2)).
+
+%Vérifie si l'état actuel est supérieur ou égal à l'état requis donné.
+verifier_etat(Etat) :-
+    etat_actuel(_, N),
+    etat(Etat, M),
+    N >= M.
 
 %Permet de... mourir.
 mourir :-
