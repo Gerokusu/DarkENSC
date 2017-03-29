@@ -66,7 +66,7 @@ salle(hall_sud) :-
     writep('[HALL SUD]', 'Du hall sud, on peut observer au nord le patio à travers les baies vitrées opaques. Un vent sombre et silencieux y rêgne, et la porte automatique ne semble pas vouloir bouger d\'un millimètre. À l\'est, la S101-S103 est bloquée par une poutre et un texte rouge vif, écrit dans la précipitation, stipulant de "NE PAS OUVRIR". À l\'ouest, le couloir de la bibliothèque s\'étend pendant plusieurs longues dizaines de mètres. Au sud, se trouve le foyer.'),
     (
         objet('pistolet', 'inventaire');
-        writel('Au sol se trouve un pistolet un peu sale, mais il semble fonctionner.')
+        writel('Au sol se trouve un [pistolet] un peu sale, mais il semble fonctionner.')
     ),
     !.
 
@@ -80,6 +80,10 @@ salle(couloir_biblio) :-
 
 salle(biblio) :-
     writep('[BIBLIOTHÈQUE]', ''),
+    (
+        objet('carte_etudiante', 'inventaire');
+        writel('Sur une étagère se trouve une [carte_etudiante] usée dont la photo a probablement été effacée par le temps.')
+    ),
     !.
 
 salle(couloir_amphi) :-
@@ -148,6 +152,12 @@ aller(_) :-
     writel('Vous ne pouvez pas aller dans cette direction.').
 
 %Permet de ramasser Objet pour le mettre dans l'inventaire. L'inventaire est considéré comme une "salle" imaginaire.
+ramasser(pistolet) :-
+    not(objet(pistolet, inventaire)),
+    writel('Un pistolet bien rouillé, mais il a l\'air chargé.'),
+    fail,
+    !.
+
 ramasser(Objet) :-
     position(Position),
     objet(Objet,Position),
