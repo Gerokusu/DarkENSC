@@ -35,6 +35,9 @@ porte(sortie, r, hall_ouest).
 
 objet(carte_etudiante, biblio).
 objet(pistolet, hall_sud).
+objet(balle, hall_ouest).
+
+recette(pistolet, balle, pistolet_charge).
 
 etat(depart, 1).
 etat(aCarteEtudiante, 2).
@@ -52,6 +55,7 @@ demarrer :-
     writel('    s                            aller au sud'),
     writel('    o                            aller à l\'ouest'),
     writel('    ramasser(objet)              ramasser un objet'),
+    writel('    assembler(objet1, objet2)    tenter d\'assembler deux objets'),
     writel('    inventaire                   afficher le contenu de votre inventaire'),
     writel('    utiliser(objet)              utiliser un objet de l\'inventaire'),
     position(Salle),
@@ -105,7 +109,11 @@ salle(amphi):-
     !.
 
 salle(hall_ouest) :-
-    writep('[HALL OUEST]', ''),
+    writep('[HALL OUEST]', 'Une étrange sensation envahit les sens dans cette salle. Un sentiment de liberté en voyant la porte automatique de la sortie, tranché par le triste retour à la réalité : le courant n\'est toujours pas rétabli. Au nord, la porte de l\'administration semble entre-ouverte. Au sud, le couloir de l\'amphithéâtre semble vous appeler.'),
+    (
+        objet('balles', 'inventaire');
+        writel('Un petit éclat provient d\'une étagère, à côté de la porte de sortie. Après inspection, il semble s\'agir d\'une [balle] de pistolet !')
+    ),
     !.
 
 salle(administration) :-
@@ -155,10 +163,19 @@ aller(mort) :-
 aller(_) :-
     writel('Vous ne pouvez pas aller dans cette direction.').
 
+%SYSTEME DE DECLENCHEURS
+%declencher(Declencheur) :-
+
 %Permet de ramasser Objet pour le mettre dans l'inventaire. L'inventaire est considéré comme une "salle" imaginaire.
 ramasser(pistolet) :-
     not(objet(pistolet, inventaire)),
-    writel('Un pistolet bien rouillé, mais il a l\'air chargé.'),
+    writel('Ce pistolet pourrait s\'avérer bien pratique... s\'il était chargé.'),
+    fail,
+    !.
+
+ramasser(balle) :-
+    not(objet(balle, inventaire)),
+    writel('Placée dans une arme à feu, cette balle pourrait blesser à peu près n\'importe quoi.'),
     fail,
     !.
 
@@ -172,7 +189,7 @@ ramasser(carte_etudiante) :-
 
 ramasser(Objet) :-
     position(Position),
-    objet(Objet,Position),
+    objet(Objet, Position),
     assert(objet(Objet, inventaire)),
     retract(objet(Objet, Position)),
     nl,
@@ -199,15 +216,66 @@ inventaire :-
     nl,
     !.
 
+%Assembler deux objets de l'inventaire
+assembler(Composant1, Composant2) :-
+    position(Position),
+    (
+        recette(Composant1, Composant2, Objet);
+        recette(Composant2, Composant1, Objet)
+    ),
+    objet(Composant1, inventaire),
+    objet(Composant2, inventaire),
+    assert(objet(Objet, Position)),
+    retract(objet(Composant1, inventaire)),
+    retract(objet(Composant2, inventaire)),
+    nl,
+    write('Vous avez assemblé l\'objet ['),
+    write_bold(Composant1, 'blue'),
+    write('] avec l\'objet ['),
+    write_bold(Composant2, 'blue'),
+    write('] pour fabriquer l\'objet ['),
+    write_bold(Objet, 'blue'),
+    write('] !'),
+    nl,
+    ramasser(Objet),
+    !.
+
+assembler(Composant1, Composant2) :-
+    (
+        not(recette(Composant1, Composant2, Objet)),
+        not(recette(Composant2, Composant1, Objet))
+    ),
+    writel('Cette recette n\'existe pas.'),
+    !.
+
+assembler(Composant1, Composant2) :-
+    (
+        not(objet(Composant1, inventaire));
+        not(objet(Composant2, inventaire))
+    ),
+    writel('Vous n\'avez pas les composants nécessaires.'),
+    !.
+
 %Utiliser un objet de l'inventaire
 utiliser(pistolet) :-
     objet(pistolet, inventaire),
-    (
-        position(s101103);
-        position(hall_sud);
-        position(administration)
-    ),
-    writel('Le pistolet s'enraye et se bloque, et une inscription \'INTERDIT AUX ENFANTS DE MOINS DE 12 ANS\' figure sur la poignée. Dommage.'),
+    objet(balles, inventaire),
+    position(administration),
+    not(verifier_etat(nadegeKO)),
+    writel('Une balle part du canon du pistolet pour se loger dans l\'épaule de Nadège. Elle semble n\'en avoir strictement rien à faire.'),
+    !.
+
+utiliser(pistolet) :-
+    objet(pistolet, inventaire),
+    objet(balles, inventaire),
+    position(administration),
+    writel('Aucune cible n\'est présente dans cette salle.'),
+    !.
+
+utiliser(pistolet) :-
+    objet(pistolet, inventaire),
+    position(administration),
+    writel('Le pistolet n\'est pas chargé. Dommage.'),
     !.
 
 utiliser(carte_etudiante) :-
@@ -228,11 +296,11 @@ utiliser(dictionnaire) :-
 
 utiliser(_) :-
     verifier_etat(courantRetabli),
-    writel('pas le temps, cours !'),
+    writel('Le temps est précieux, aucun objet ne peut-être utilisé !'),
     !.
 
 utiliser(_) :-
-    writel('tu ne peux pas faire ça'),
+    writel('Vous ne pouvez pas utiliser cet objet.'),
     !.
 
 ordinateur :-
