@@ -1,4 +1,3 @@
-
 %Fonctions utilitaires
 
 %Écrit une nouvelle ligne.
