@@ -79,25 +79,29 @@ salle(couloir_biblio) :-
     !.
 
 salle(biblio) :-
-    writep('[BIBLIOTHÈQUE]', ''),
-    (
-        objet('carte_etudiante', 'inventaire');
-        writel('Sur une étagère se trouve une [carte_etudiante] usée dont la photo a probablement été effacée par le temps.')
-    ),
+    verifier_etat(aCarteEtudiante),
+    writep('[BIBLIOTHÈQUE]', 'Anormalement vide, la bibliothèque ne contient que quelques ouvrages brûlés, déchirés et illisibles. La vitre du bureau de la bibliothéquaire est cassée, mais aucun objet intéressant n\'est présent. La seule sortie est au nord, vers le couloir de la bibliothèque.'),
+    !.
+
+salle(biblio) :-
+    writep('[BIBLIOTHÈQUE]', 'Anormalement vide, la bibliothèque ne contient que quelques ouvrages brûlés, déchirés et illisibles. La vitre du bureau de la bibliothéquaire est cassée, mais aucun objet intéressant n\'est présent à l\'exception d\'une carte étudiante. La seule sortie est au nord, vers le couloir de la bibliothèque.'),
+    writel('Sur une étagère se trouve la [carte_etudiante] solitaire.'),
     !.
 
 salle(couloir_amphi) :-
     verifier_etat(amphiOK),
-    writep('[COULOIR DE L\'AMPHITHÉÂTRE]', ''),
+    writep('[COULOIR DE L\'AMPHITHÉÂTRE]', 'Les feuilles qui ornaient le mur paraissent avoir changé. Beaucoup plus de symboles sont présents, écrits dans un rouge vif. Au nord, le hall ouest semble baigner dans un manteau noir. Le chemin est mène vers le couloir de la bibliothèque, qui semble beaucoup plus long qu\'auparavant. Le porte ouest est maintenant ouverte, et donne sur l\'amphithéâtre.'),
+    writel('Les boîtiers de validation ont leur diode verte. La porte est débloquée.'),
     !.
 
 salle(couloir_amphi) :-
-    writep('[COULOIR DE L\'AMPHITHÉÂTRE]', 'lacces à lamphi est verrouille'),
+    writep('[COULOIR DE L\'AMPHITHÉÂTRE]', 'Le mur anciennement rempli d\'affiches sur les clubs de l\'école ne contient maintenant que des feuilles de papier griffonnées dans une langue incompréhensible. Quelques symboles occultes sont reconnaissables. Au nord, le hall ouest semble baigner dans un manteau noir. Le chemin est mène vers le couloir de la bibliothèque, qui semble beaucoup plus long qu\'auparavant. La porte ouest est quant à elle fermée, et donne sur l\'amphithéâtre.'),
+    writel('Le courant semble fonctionner dans les petits boîtiers de validation, dont la diode est rouge. Peut-être qu\'une carte étudiante pourrait ouvrir la porte ?'),
     !.
 
 salle(amphi):-
-    writep('[AMPHITHÉÂTRE]', 'Ecrire blablah il rentre dans l amphi et voit l ordi avec pesquet dessus (GIF) + trouver sol enigme sinon attention ombre de Paf + dire décrire la rep entre enigme()'),
-    writel('ENIGME : Pour moi l\'accouchement est avant la grossesse, l\'enfance avant la naissance, l\'adolescence avant l\'enfant, la mort avant la vie. Qui suis-je?'),
+    writep('[AMPHITHÉÂTRE]', 'Un atmosphère rassurant semblable à celui du foyer reigne dans l\'amphithéâtre, qui semble avoir été épargné. Une lumière tamisée brille au fond : il s\'agit d\'un ordinateur ! Il est cependant figé sur un seul écran, qui s\'apparente à un terminal. Il est possible de sortir par la porte nord.'),
+    ordinateur,
     !.
 
 salle(hall_ouest) :-
@@ -158,20 +162,25 @@ ramasser(pistolet) :-
     fail,
     !.
 
+ramasser(carte_etudiante) :-
+    not(objet(carte_etudiante, inventaire)),
+    writel('Une carte étudiante sans photo et au nom effacé avec le temps.'),
+    writel('Vous entendez un bruit sourd au loin.'),
+    changer_etat(aCarteEtudiante),
+    fail,
+    !.
+
 ramasser(Objet) :-
     position(Position),
     objet(Objet,Position),
     assert(objet(Objet, inventaire)),
     retract(objet(Objet, Position)),
     nl,
-    write('Youpi ! L\'objet '),
-    write(Objet),
-    write(' a été ajouté au sac !'),
+    write('L\'objet ['),
+    write_bold(Objet, 'blue'),
+    write('] a été ajouté au sac !'),
     nl,
     !.
-
-    %créer un événement au ramassage (ici c'est pour changer l'état : aCarteEtudiante et aDictionnaire)
-    %tester les utiliser()
 
 ramasser(_):-
     writel('Aucun objet ne peut être ramassé ici.'),
@@ -191,24 +200,25 @@ inventaire :-
     !.
 
 %Utiliser un objet de l'inventaire
-utiliser(pistolet):-
+utiliser(pistolet) :-
     objet(pistolet, inventaire),
     (
         position(s101103);
         position(hall_sud);
         position(administration)
     ),
-    writel('Le pistolet n\'était pas chargé, et une inscription \'FACTICE\' figure sur la poignée. Dommage.'),
+    writel('Le pistolet s'enraye et se bloque, et une inscription \'INTERDIT AUX ENFANTS DE MOINS DE 12 ANS\' figure sur la poignée. Dommage.'),
     !.
 
-utiliser(carte_etudiante):-
+utiliser(carte_etudiante) :-
     objet(carte_etudiante,inventaire),
     position(couloir_amphi),
     assert(porte(couloir_amphi, o, amphi)),
-    writel('L\'accès à l\'amphi est ok'),
+    writel('En plaquant la carte étudiante sur l\'un des boîtiers, un petit \'bip\' s\'en échappe, et sa diode change de couleur pour le vert. L\'accès à l\'amphithéâtre est possible !'),
+    changer_etat(amphiOK),
     !.
 
-utiliser(dictionnaire):-
+utiliser(dictionnaire) :-
     objet(dictionnaire,inventaire),
     position(administration),
     assert(porte(administration,o,bureau_plotton)),
@@ -216,32 +226,49 @@ utiliser(dictionnaire):-
     changer_etat(nadegeKO),
     !.
 
-utiliser(_):-
+utiliser(_) :-
     verifier_etat(courantRetabli),
     writel('pas le temps, cours !'),
     !.
 
-utiliser(_):-
+utiliser(_) :-
     writel('tu ne peux pas faire ça'),
     !.
 
+ordinateur :-
+    verifier_etat(aDictionnaire),
+    writel('Le terminal a été remplacé par une fenêtre en plein écran, sur laquelle est affiché \'FÉLICITATIONS !\'.'),
+    !.
+
+ordinateur :-
+    writel('Un texte étrange est affiché sur l\'ordinateur : \"Pour moi, l\'accouchement est avant la grossesse, l\'enfance avant la naissance, l\'adolescence avant l\'enfance, et la mort avant la vie. Qui suis-je ?\". Une commande semble avoir été testée : la commande \'enigme(jesaispas)\'. Elle s\'est cependant soldée par un échec.'),
+    !.
+
+
 %Permet de vérifier si le joueur trouve l'énigme
-enigme(dictionnaire):-
+enigme(dictionnaire) :-
     position(amphi),
-    not(objet(dictionnaire,inventaire)),
+    not(objet(dictionnaire, inventaire)),
     assert(objet(dictionnaire, amphi)),
     writel('placard souvre et dico'),
     ramasser(dictionnaire),
+    changer_etat(aDictionnaire),
     !.
 
-enigme(_):-
+enigme(pesquet) :-
+    position(amphi),
+    not(objet(dictionnaire, inventaire)),
+    write('Une image GIF animée s\'affiche soudainement, montrant un professeur d\'informatique bien connu en train de danser la lambada. Imprévisible, mais quel bon danseur.'),
+    !.
+
+enigme(_) :-
     position(amphi),
     not(objet(dictionnaire,inventaire)),
-    writel('paf la menace'),
-    mourir_prevention,
+    writel('Un bruit sourd notifiant une erreur résonne soudain dans l\'amphithéâtre, qui semble se faire envahir par les ombres. Un ricanement grinçant retentit alors qu\'un profond tremblement se fait sentir. La lumière de l\'ordinateur éclaire un visage terrifiant, équipé de lunettes cassées, qui, progressivement, finit par occuper tout le champ de vision. Il est déjà trop tard.'),
+    mourir,
     !.
 
-enigme(_):-
+enigme(_) :-
     writel('Qu\'est ce que vous essayez de faire?').
 
 %Permet de changer d'état.
