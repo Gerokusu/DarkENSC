@@ -83,3 +83,4 @@ n :- aller(n).
 e :- aller(e).
 s :- aller(s).
 o :- aller(o).
+i :- inventaire.
