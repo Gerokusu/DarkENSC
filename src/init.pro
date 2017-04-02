@@ -4,24 +4,26 @@
 %Chargement des fichiers
 :- consult('utils.pro').
 :- consult('etat.pro').
+:- consult('temps.pro').
 :- consult('salle.pro').
 :- consult('inventaire.pro').
 :- consult('ramasser.pro').
 :- consult('assembler.pro').
 :- consult('utiliser.pro').
 :- consult('ordinateur.pro').
-:- consult('mourir.pro').
+:- consult('fin.pro').
 
 %Initialisation des prédicats dynamiques
-:- dynamic position/1, etat_actuel/2, porte/3, objet/2.
+:- dynamic position/1, etat_actuel/2, porte/3, objet/2, temps/1.
 
 %À rerentrer dans demarrer
 :- retractall(position(_)).
 :- retractall(objet(_)).
 
-%Position de départ du joueur et état initial
+%Position de départ du joueur, état initial et temps restant initial
 position(foyer).
 etat_actuel(depart, 1).
+temps(20).
 
 %Définition des données
 porte(foyer, n, hall_sud).
@@ -56,7 +58,7 @@ etat(courantRetabli, 6).
 
 %Définition des données de jeu
 demarrer :-
-    writep('[INTRODUCTION]', 'Vous vous réveillez d\'un sommeil profond, accompagné d\'un mal au crâne notoire, et d\'une sensation de malaise. Vous vous sentez seul, vous êtes seul.'),
+    writep('[INTRODUCTION]', 'Vous vous réveillez d\'un sommeil profond, accompagné d\'un mal au crâne notoire, et d\'une sensation de malaise. Vous vous sentez seul... vous êtes seul.'),
     writel('Les commandes suivantes sont à votre disposition (terminer par un point) :'),
     writel('    n                            aller au nord'),
     writel('    e                            aller à l\'est'),

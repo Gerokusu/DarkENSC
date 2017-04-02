@@ -2,25 +2,11 @@
 :- encoding(utf8).
 
 %Utiliser un objet de l'inventaire
-utiliser(pistolet) :-
-    objet(pistolet, inventaire),
-    objet(balles, inventaire),
+utiliser(pistolet_charge) :-
+    objet(pistolet_charge, inventaire),
     position(administration),
     not(verifier_etat(nadegeKO)),
-    writel('Une balle part du canon du pistolet pour se loger dans l\'épaule de Nadège. Elle semble n\'en avoir strictement rien à faire.'),
-    !.
-
-utiliser(pistolet) :-
-    objet(pistolet, inventaire),
-    objet(balles, inventaire),
-    position(administration),
-    writel('Aucune cible n\'est présente dans cette salle.'),
-    !.
-
-utiliser(pistolet) :-
-    objet(pistolet, inventaire),
-    position(administration),
-    writel('Le pistolet n\'est pas chargé. Dommage.'),
+    writel('Une balle part du canon du pistolet pour se loger dans l\'épaule du la silhouette. Cependant, elle semble n\'en avoir strictement rien à faire.'),
     !.
 
 utiliser(carte_etudiante) :-
@@ -32,10 +18,10 @@ utiliser(carte_etudiante) :-
     !.
 
 utiliser(dictionnaire) :-
-    objet(dictionnaire,inventaire),
+    objet(dictionnaire, inventaire),
     position(administration),
-    assert(porte(administration,o,bureau_plotton)),
-    writel('Vous pouvez maintenant accéder au bureau de Plotton !'),
+    assert(porte(administration, o, bureau_plotton)),
+    writel('N\'ayant rien d\'autre à faire, vous lancez le dictionnaire à la face de la silhouette, qui s\'écroule, assomée, par terre. Elle se revèle n\'être autre que Nadège Rodriguez, la secrétaire ! Vous pouvez maintenant accéder au bureau de Plotton.'),
     changer_etat(nadegeKO),
     !.
 

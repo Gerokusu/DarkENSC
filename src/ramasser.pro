@@ -22,6 +22,12 @@ ramasser(carte_etudiante) :-
     fail,
     !.
 
+ramasser(dictionnaire) :-
+    not(objet(dictionnaire, inventaire)),
+    writel('Un dictionnaire bien costaud qui pourrait assomer à peu près n\'importe quoi.'),
+    fail,
+    !.
+
 ramasser(Objet) :-
     position(Position),
     objet(Objet, Position),

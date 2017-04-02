@@ -1,13 +1,22 @@
+%Initialisation de l'encodage
+:- encoding(utf8).
+
 %Décrit l'événement déclenché à l'entrée d'une salle.
 salle(foyer) :-
     writep('[FOYER DE L\'ÉCOLE]', 'Le foyer de l\'école est d\'habitude un endroit serein où les élèves ont l\'habitude de se reposer. Mais il est anormalement sale, poussiéreux, et présente quelques traces de sang. Le baby-foot est cassé, le bar est vide, les canapés sont déchirés et une seule porte, au nord, est en état de fonctionner. Elle mène au hall sud.'),
+    writel('Sur le mur est inscrit avec ce qui semble être du sang : 20 MINUTES. Il ne s\'agit probablement pas du journal, mais plutôt du temps qu\'il reste avant que quelquechose de terrible ne se produise.'),
     !.
 
 salle(hall_sud) :-
-    writep('[HALL SUD]', 'Du hall sud, on peut observer au nord le patio à travers les baies vitrées opaques. Un vent sombre et silencieux y rêgne, et la porte automatique ne semble pas vouloir bouger d\'un millimètre. À l\'est, la S101-S103 est bloquée par une poutre et un texte rouge vif, écrit dans la précipitation, stipulant de "NE PAS OUVRIR". À l\'ouest, le couloir de la bibliothèque s\'étend pendant plusieurs longues dizaines de mètres. Au sud, se trouve le foyer.'),
+    writep('[HALL SUD]', 'Du hall sud, on peut observer au nord le patio à travers les baies vitrées opaques. Un vent sombre et silencieux y rêgne, et la porte automatique ne semble pas vouloir bouger d\'un millimètre. À l\'est, la S101-S103 est bloquée par une poutre et un texte rouge vif, écrit dans la précipitation, stipulant de "NE PAS OUVRIR". À l\'ouest, le couloir de la bibliothèque s\'étend pendant plusieurs longues dizaines de mètres.'),
     (
         objet('pistolet', 'inventaire');
         writel('Au sol se trouve un [pistolet] un peu sale, mais il semble fonctionner.')
+    ),
+    (
+        not(porte(hall_sud, s, foyer));
+        retract(porte(hall_sud, s, foyer)),
+        writel('La porte du foyer se ferme dans un vacarme assourdissant et disparait, laissant place à la continuité du mur sur lequel elle était présente. Il n\'est plus possible d\'y retourner.')
     ),
     !.
 
@@ -41,6 +50,12 @@ salle(couloir_amphi) :-
     !.
 
 salle(amphi):-
+    verifier_etat(aDictionnaire),
+    writep('[AMPHITHÉÂTRE]', 'Un atmosphère rassurant semblable à celui du foyer reigne dans l\'amphithéâtre, qui semble avoir été épargné. Une lumière tamisée brille au fond : il s\'agit d\'un ordinateur ! Il est cependant figé sur un seul écran, qui s\'apparente à un terminal. Il est possible de sortir par la porte nord.'),
+    ordinateur,
+    !.
+
+salle(amphi):-
     writep('[AMPHITHÉÂTRE]', 'Un atmosphère rassurant semblable à celui du foyer reigne dans l\'amphithéâtre, qui semble avoir été épargné. Une lumière tamisée brille au fond : il s\'agit d\'un ordinateur ! Il est cependant figé sur un seul écran, qui s\'apparente à un terminal. Il est possible de sortir par la porte nord.'),
     ordinateur,
     !.
@@ -54,25 +69,30 @@ salle(hall_ouest) :-
     !.
 
 salle(administration) :-
-    writep('[BUREAUX DE L\'ADMINISTRATION]', 'nadege bloque'),
+    verifier_etat(nadegeKO),
+    writep('[BUREAUX DE L\'ADMINISTRATION]', 'Le corps assommé de Nadège a disparu, seul reste un bout de sa main accroché au mur... Il est possible d\'accéder au bureau de Plotton par l\'ouest, ou revenir au hall ouest par le sud.'),
+    !.
+
+salle(administration) :-
+    writep('[BUREAUX DE L\'ADMINISTRATION]', 'Au milieu des bureaux se dresse un silhouette noire et élancée, habillée comme une secrétaire, dont les deux yeux rouges fixent quiconque ose les regarder. Cependant, elle semble attachée au mur et ne peut bouger. Celà dit, mieux vaut ne pas s\'en approcher. Elle bloque l\'accès ouest vers le bureau de Plotton. Au sud, la porte mène vers le hall ouest.'),
     !.
 
 salle(bureau_plotton):-
-    writep('[BUREAU DE PLOTTON]', ''),
+    writep('[BUREAU DE PLOTTON]', 'Dans une jungle de câbles et appareils électroniques, il est possible de distinguer le disjoncteur de l\'école. Grâce à lui, il sera possible d\'ouvrir la porte de sortie !'),
     !.
 
 salle(sortie):-
     verifier_etat(courantRetabli),
-    writep('[SORTIE]', 'gagné !'),
+    writep('[SORTIE]', 'Grâce au courant rétabli, la porte s\'ouvre enfin ! La liberté s\'étend en face, mais des silhouettes inquiétantes font leur apparition au fur et à mesure que l\'ENSC disparaît...'),
     !.
 
 salle(sortie):-
-    writel('vous ne pouvez pas sortir, courant marche pas'),
+    writel('Malgré tous les efforts, la porte refuse de s\'ouvrir. Le courant doit être rétabli pour pouvoir l\'actionner.'),
     aller(r),
     !.
 
 salle(_):-
-    writel('erreur predicat salle'),
+    writel('Cette salle n\'existe pas.'),
     !.
 
 %Permet de se rendre à la salle par la porte située à Direction.
@@ -89,9 +109,10 @@ aller(Direction) :-
     retract(position(Position)),
     assert(position(Destination)),
     salle(Destination),
+    temps_baisse(),
     !.
 
-aller(mort) :-
+aller(fin) :-
     writel('Le jeu va maintenant se quitter. Veuillez appuyer sur Entrée.'),
     nl,
     get_char(_),
