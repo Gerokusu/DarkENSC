@@ -3,8 +3,18 @@
 
 %Décrit l'événement déclenché à l'entrée d'une salle.
 salle(foyer) :-
+    temps(X),
     writep('[FOYER DE L\'ÉCOLE]', 'Le foyer de l\'école est d\'habitude un endroit serein où les élèves ont l\'habitude de se reposer. Mais il est anormalement sale, poussiéreux, et présente quelques traces de sang. Le baby-foot est cassé, le bar est vide, les canapés sont déchirés et une seule porte, au nord, est en état de fonctionner. Elle mène au hall sud.'),
-    writel('Sur le mur est inscrit avec ce qui semble être du sang : 20 MINUTES. Il ne s\'agit probablement pas du journal, mais plutôt du temps qu\'il reste avant que quelquechose de terrible ne se produise.'),
+    nl,
+    write('Sur le mur est inscrit avec ce qui semble être du sang : '),
+    write(X),
+    write(' MINUTES. Il ne s\'agit probablement pas du journal, mais plutôt du temps qu\'il reste avant que quelquechose de terrible ne se produise.'),
+    nl,
+    !.
+
+salle(hall_sud) :-
+    verifier_etat(poursuite),
+    writep('[HALL SUD]', 'Du hall sud, on peut observer au nord le patio à travers les baies vitrées opaques. Un vent sombre et silencieux y rêgne, et la porte automatique fonctionne. À l\'est, la S101-S103 est bloquée par une poutre et un texte rouge vif, écrit dans la précipitation, stipulant de "NE PAS OUVRIR". À l\'ouest, le couloir de la bibliothèque s\'étend pendant plusieurs longues dizaines de mètres.'),
     !.
 
 salle(hall_sud) :-
@@ -61,10 +71,21 @@ salle(amphi):-
     !.
 
 salle(hall_ouest) :-
+    verifier_etat(poursuite),
+    writep('[HALL OUEST]', 'C\'est à l\'ouest que se trouve la porte de sortie ! Au nord, la porte de l\'administration semble entre-ouverte. Au sud, le couloir de l\'amphithéâtre semble vous appeler. Et à l\'est, le patio est accessible.'),
+    !.
+
+salle(hall_ouest) :-
     writep('[HALL OUEST]', 'Une étrange sensation envahit les sens dans cette salle. Un sentiment de liberté en voyant la porte automatique de la sortie, tranché par le triste retour à la réalité : le courant n\'est toujours pas rétabli. Au nord, la porte de l\'administration semble entre-ouverte. Au sud, le couloir de l\'amphithéâtre semble vous appeler.'),
     (
         objet('balles', 'inventaire');
         writel('Un petit éclat provient d\'une étagère, à côté de la porte de sortie. Après inspection, il semble s\'agir d\'une [balle] de pistolet !')
+    ),
+    (
+        not(verifier_etat_strict(courantRetabli));
+        writel('Le courant a permis d\'ouvrir la porte du patio à l\'est et la porte de sortie à l\'ouest, mais Claverie bloque l\'accès de cette dernière et commence à vous poursuivre !'),
+        changer_etat(detecte),
+        assert(claverie(o))
     ),
     !.
 
@@ -78,12 +99,17 @@ salle(administration) :-
     !.
 
 salle(bureau_plotton):-
-    writep('[BUREAU DE PLOTTON]', 'Dans une jungle de câbles et appareils électroniques, il est possible de distinguer le disjoncteur de l\'école. Grâce à lui, il sera possible d\'ouvrir la porte de sortie !'),
+    writep('[BUREAU DE PLOTTON]', 'Dans une jungle de câbles et appareils électroniques, il est possible de distinguer le [disjoncteur] de l\'école. Grâce à lui, il sera possible d\'ouvrir la porte de sortie ! Il est possible de revenir aux bureaux de l\'administration par la porte est.'),
+    !.
+
+salle(patio) :-
+    writep('[PATIO]', 'Occupé par des vents sombres, le patio autrefois paisible sent la mort et le danger. Il serait bon ne pas s\'y attarder.'),
     !.
 
 salle(sortie):-
     verifier_etat(courantRetabli),
     writep('[SORTIE]', 'Grâce au courant rétabli, la porte s\'ouvre enfin ! La liberté s\'étend en face, mais des silhouettes inquiétantes font leur apparition au fur et à mesure que l\'ENSC disparaît...'),
+    victoire,
     !.
 
 salle(sortie):-
@@ -106,9 +132,24 @@ aller(r) :-
 aller(Direction) :-
     position(Position),
     porte(Position, Direction, Destination),
+    (
+        not(verifier_etat(poursuite));
+        claverie_verifier(Direction)
+    ),
     retract(position(Position)),
     assert(position(Destination)),
     salle(Destination),
+    (
+        (
+            not(verifier_etat(poursuite));
+            claverie_tp(Direction)
+        ),
+        (
+            not(verifier_etat_strict(detecte));
+            claverie_tp(e),
+            changer_etat(poursuite)
+        )
+    ),
     temps_baisse(),
     !.
 

@@ -17,7 +17,7 @@ enigme(dictionnaire) :-
     position(amphi),
     not(objet(dictionnaire, inventaire)),
     assert(objet(dictionnaire, amphi)),
-    writel('Un message marqué "SUCCÈS" s\'affiche, en même temps que le tiroir du beau s\'ouvre. Un dictionnaire bien solide est placé à l\'intérieur. Vous décidez de le prendre, ça peut toujours servir.'),
+    writel('Un message marqué "SUCCÈS" s\'affiche, en même temps que le tiroir du bureau s\'ouvre. Un dictionnaire bien solide est placé à l\'intérieur. Vous décidez de le prendre, ça peut toujours servir.'),
     ramasser(dictionnaire),
     changer_etat(aDictionnaire),
     !.

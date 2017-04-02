@@ -15,3 +15,8 @@ verifier_etat(Etat) :-
     etat_actuel(_, N),
     etat(Etat, M),
     N >= M.
+
+verifier_etat_strict(Etat) :-
+    etat_actuel(_, N),
+    etat(Etat, M),
+    N == M.
